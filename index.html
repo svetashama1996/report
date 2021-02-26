@@ -1,0 +1,100 @@
+<html>
+<head>
+<title>Basic File Upload</title>
+</head>
+<body>
+<h1>Basic File Upload</h1>
+<form method="post" action="basic.php" enctype="multipart/form-data">
+<label for="inputfile">Upload File</label>
+<input type="file" id="inputfile" name="inputfile"></br>
+<input type="submit" value="Click To Upload">
+<?php
+
+$array1=file('RKK.txt');
+$array2=file('appeal.txt');
+//var_dump($array1[0]);
+//var_dump($homepage);
+	/*$str1='Лобанов Сергей Геннадьевич Новиков И.А. (Отв.); Иванова А.А. (Отв.); Чуфырин Ю.В.';
+	$str2='Зайцева Любовь Евлампиевна Новиков И.А. (Отв.); Андреева Т.С.; Мартынова Е.А. (Отв.)';
+	$str3='Зайцева Любовь Евлампиевна Новиков И.А. (Отв.); Андреева Т.С.; Мартынова Е.А. (Отв.)';
+	$str4='Климов Сергей Александрович Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.';
+	$str5='Тарасов Михаил Андреевич Иванов А.Ю. (Отв.)';
+	$str6='Маринин Иван Васильевич Нестерович В.М. (Отв.)';
+	$str7='Владимиров Сергей Сергеевич Глухова К.А.';
+	$str8='Маринин Иван Васильевич Нестерович В.М. (Отв.); Мандрыгина А.Ф.';
+	$str9='Климов Сергей Александрович Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.;';
+	$str10='Климов Сергей Александрович Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Большова О.В.; Бо';
+	$arr=[$str1,$str2,$str3,$str4];
+	$arr1=[$str5,$str6,$str7,$str8,$str9,$str10];*/
+	function name_format($str){
+		$str=explode(" ", $str);
+		$str1=strval($str[1]);
+		$str2=strval($str[2]);
+		$len1=ceil((strlen($str1))/2);
+		$l1=1-$len1;
+		$len2=ceil((strlen($str2))/2);
+		$l2=1-$len2;
+		$str1=mb_substr($str1,0, $l1);
+		$str2=mb_substr($str2,0, $l2);
+		$str=$str[0]." ".$str1.".".$str2.".";
+		return $str;
+	}
+	function Count_array($arr){
+		$array1=[];
+		foreach ($arr as $key => $value) {
+			$arr[$key]=explode(" ", $value);
+			$arr[$key][2]=$arr[$key][2].";";
+			$array1[]=implode($arr[$key], " ");
+		}
+		$array2=[];
+		foreach($array1 as $key => $value){
+			$arr3[$key]=explode(";", $value);
+			for($i=0;$i<count($arr3[$key]);$i++){
+				trim($arr3[$key][$i]);
+			}
+			if($arr3[$key][0]=="Климов Сергей Александрович"){
+				$arr3[$key][1]=str_replace("(Отв.)", " ", $arr3[$key][1]);
+				$array2[]=trim($arr3[$key][1]);
+			}
+			else{
+				$arr3[$key][0]=name_format($arr3[$key][0]);
+				$array2[]=trim($arr3[$key][0]);
+			}
+					
+		}
+		$array2=array_count_values($array2);
+		return $array2;
+	}
+	
+	function Report_create($arr, $arr1){
+		$arr2=array_intersect_key($arr,$arr1);
+		$arr3=array_diff_key($arr,$arr1);
+		$arr4=array_diff_key($arr1,$arr);
+		$arr5=array_intersect_key($arr1,$arr);
+		$arr6=[];
+		foreach($arr2 as $key => $value){
+			$arr6[]=[$key,$value,$arr5[$key],$value+$arr5[$key]];
+		}
+		foreach($arr3 as $key => $value){
+			$arr6[]=[$key,$value,0,$value];
+		}
+		foreach($arr4 as $key => $value){
+			$arr6[]=[$key,0,$value,$value];
+		}
+			
+		//echo "Ответственный исполнитель"."Количество неисполненных входящих документов"."Количество неисполненных письменных обращений граждан"."Общее количество документов и обращений";
+		foreach($arr6 as $key => $value){
+			//echo $key."-".$value."<br>";
+			echo $value[0]." - ".$value[1]."; ".$value[2]."; ".$value[3]."<br>";
+		}
+		
+	}
+	$arr=Count_array($array1);
+	//var_dump($array11);
+	$arr1=Count_array($array2); 
+	Report_create($arr, $arr1);
+
+?>
+</form>
+</body>
+</html>
